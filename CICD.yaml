@@ -3,14 +3,14 @@
   hosts: all
   become: yes
   vars:
-    repository_url: https://github.com/jaiswaladi246/secretsanta-generator.git
+    repository_url: https://github.com/nanbabu/Ansible-Project-2.git
   vars_files:
     - docker_credentials.yml
   tasks:
     - name: Clone or pull repository
       ansible.builtin.git:
         repo: "{{ repository_url }}"
-        dest: /home/ubuntu/secretsanta-generator
+        dest: /home/ubuntu/Ansible-Project-2
         update: yes
       register: git_result
       
@@ -20,32 +20,32 @@
         
     - name: Copy shell script to remote server
       copy:
-        src: docker-container-condition.sh
-        dest: /home/ubuntu/secretsanta-generator/docker-container-condition.sh
+        src: docker-condition.sh
+        dest: /home/ubuntu/Ansible-Project-2/docker-condition.sh
         
     - name: Permissions on shell script
-      command: chmod +x docker-container-condition.sh
+      command: chmod +x docker-condition.sh
       args:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
         
     - name: Execute shell script
-      command: ./docker-container-condition.sh
+      command: ./docker-condition.sh
       args:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
 
     - name: Run mvn compile
       command: mvn compile
       args:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
         
     - name: Run mvn Test
       command: mvn test
       args:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
         
     - name: Execute SonarScanner
       ansible.builtin.command:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
         argv:
           - /home/ubuntu/sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner
           - -Dsonar.host.url={{ SONARQUBE_URL }}
@@ -57,22 +57,23 @@
     - name: Run mvn build
       command: mvn package
       args:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
         
     - name: Build & Tag Docker Image
-      command: docker build -t adijaiswal/santa:latest .
+      command: docker build -t nanda27kumar/santa:latest .
       args:
-        chdir: /home/ubuntu/secretsanta-generator
+        chdir: /home/ubuntu/Ansible-Project-2
         
     - name: Scan Docker Image
       command: trivy image --format table -o trivy-image-report.html
-        adijaiswal/santa:latest
+        nanda27kumar/santa:latest
         
     - name: Log in to Docker registry
       command: docker login -u {{ docker_username }} -p {{ docker_password }}
       
     - name: Push Docker Image
-      command: docker push adijaiswal/santa:latest
+      command: docker push nanda27kumar/santa:latest
       
     - name: Deploy To Container
-      command: docker run -d --name secret-santa -p 8080:8080 adijaiswal/santa:latest
+      command: docker run -d --name secret-santa -p 8080:8080 nanda27kumar/santa:latest
+
