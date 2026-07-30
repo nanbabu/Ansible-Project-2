@@ -12,6 +12,7 @@
         repo: "{{ repository_url }}"
         dest: /home/ubuntu/Ansible-Project-2
         update: yes
+        force: yes
       register: git_result
       
     - name: Check if repository was cloned or updated
@@ -65,8 +66,7 @@
         chdir: /home/ubuntu/Ansible-Project-2
         
     - name: Scan Docker Image
-      command: trivy image --format table -o trivy-image-report.html
-        nanda27kumar/santa:latest
+      command: trivy image --format table -o trivy-image-report.html nanda27kumar/santa:latest
         
     - name: Log in to Docker registry
       command: docker login -u {{ docker_username }} -p {{ docker_password }}
